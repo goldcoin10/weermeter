@@ -7,7 +7,7 @@ long=$(echo "$loc" | jq -r '.longitude')
 city=$(echo "$loc" | jq -r '.city')
 region=$(echo "$loc" | jq -r '.region_code')
 country=$(echo "$loc" | jq -r '.country')
-ver="0.1.2"
+ver="0.1.3"
 help(){
     echo "Weermeter $ver"
     echo "usage:"
@@ -17,13 +17,13 @@ help(){
     echo "-v (displays version)"
 }
 americatemp(){
-    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude="$lat"&longitude="$long"&current=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&current=is_day,apparent_temperature")
+    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&current=is_day,apparent_temperature")
     current_temp=$(echo "$meteo" | jq -r --compact-output '.current.temperature_2m')
     temp_unit=$(echo "$meteo" | jq -r --compact-output '.current_units.temperature_2m')
     feelslike=$(echo "$meteo" | jq -r --compact-output '.current.apparent_temperature')
 }
 worldtemp(){
-    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude="$lat"&longitude="$long"&current=temperature_2m&forecast_days=1&current=is_day,apparent_temperature")
+    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m&forecast_days=1&current=is_day,apparent_temperature")
     current_temp=$(echo "$meteo" | jq -r --compact-output '.current.temperature_2m')
     temp_unit=$(echo "$meteo" | jq -r --compact-output '.current_units.temperature_2m')
     feelslike=$(echo "$meteo" | jq -r --compact-output '.current.apparent_temperature')
