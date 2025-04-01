@@ -7,12 +7,14 @@ long=$(echo "$loc" | jq -r '.longitude')
 city=$(echo "$loc" | jq -r '.city')
 region=$(echo "$loc" | jq -r '.region_code')
 country=$(echo "$loc" | jq -r '.country')
+ver="0.1.2"
 help(){
-    echo "Weermeter"
+    echo "Weermeter $ver"
     echo "usage:"
     echo "-c (displays temperature in celcius)"
     echo "-f (displays temperature in fahrenheit)"
     echo "-h (displays this help prompt)"
+    echo "-v (displays version)"
 }
 americatemp(){
     meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude="$lat"&longitude="$long"&current=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&current=is_day,apparent_temperature")
@@ -28,6 +30,10 @@ worldtemp(){
 }
 if [[ "$1" = -h ]]; then
     help
+    exit 0
+fi
+if [[ "$1" = -v ]]; then
+    echo "$ver"
     exit 0
 fi
 if [[ $country = 'US' || "$1" = -f ]]; then
