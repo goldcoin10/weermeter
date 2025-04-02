@@ -12,24 +12,26 @@ help(){
     echo "Weermeter $ver"
     echo "usage:"
     echo "-c (displays temperature in celcius)"
+    echo "-d (displays meteo variable, debug)"
     echo "-f (displays temperature in fahrenheit)"
     echo "-h (displays this help prompt)"
     echo "-v (displays version)"
 }
 americatemp(){
-    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m&temperature_unit=fahrenheit&forecast_days=1&current=is_day,apparent_temperature")
-    current_temp=$(echo "$meteo" | jq -r --compact-output '.current.temperature_2m')
-    temp_unit=$(echo "$meteo" | jq -r --compact-output '.current_units.temperature_2m')
-    feelslike=$(echo "$meteo" | jq -r --compact-output '.current.apparent_temperature')
+    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m,apparent_temperature,wind_speed_10m&wind_speed_unit=mph&temperature_unit=fahrenheit")
 }
 worldtemp(){
-    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m&forecast_days=1&current=is_day,apparent_temperature")
-    current_temp=$(echo "$meteo" | jq -r --compact-output '.current.temperature_2m')
-    temp_unit=$(echo "$meteo" | jq -r --compact-output '.current_units.temperature_2m')
-    feelslike=$(echo "$meteo" | jq -r --compact-output '.current.apparent_temperature')
+    meteo=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$long&current=temperature_2m,apparent_temperature,wind_speed_10m")
 }
 if [[ "$1" = -h ]]; then
     help
+    exit 0
+fi
+if [[ "$1" = -d ]]; then
+    worldtemp
+    echo "$meteo"
+    echo "$loc"
+    echo "$ip"
     exit 0
 fi
 if [[ "$1" = -v ]]; then
@@ -42,7 +44,13 @@ fi
 if [[ ! $country = 'US' || "$1" = -c ]]; then
     worldtemp
 fi
+current_temp=$(echo "$meteo" | jq -r -c '.current.temperature_2m')
+tempunit=$(echo "$meteo" | jq -r -c '.current_units.temperature_2m')
+feelslike=$(echo "$meteo" | jq -r -c '.current.apparent_temperature')
+windspeed=$(echo "$meteo" | jq -r -c '.current.wind_speed_10m')
+speedunit=$(echo "$meteo" | jq -r -c '.current_units.wind_speed_10m')
 echo "$city, $region, $country"
 echo "Coordinates: $lat, $long"
-echo "Current temp: $current_temp $temp_unit"
-echo "Feels like: $feelslike $temp_unit"
+echo "Current temp: $current_temp $tempunit"
+echo "Feels like: $feelslike $tempunit"
+echo "Wind Speed: $windspeed $speedunit"
